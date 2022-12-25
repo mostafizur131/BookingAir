@@ -1,9 +1,10 @@
 import React, { useContext } from "react";
 
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import PrimaryButton from "../../Components/Button/PrimaryButton";
 import { AuthContext } from "../../contexts/AuthProvider";
 import toast from "react-hot-toast";
+import SmallSpinner from "../../Components/Spinner/SmallSpinner";
 
 const Signup = () => {
   const {
@@ -14,6 +15,10 @@ const Signup = () => {
     loading,
     setLoading,
   } = useContext(AuthContext);
+
+  const location = useLocation();
+  const navigate = useNavigate();
+  const from = location.state?.from?.pathname || "/";
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -46,14 +51,20 @@ const Signup = () => {
                     toast.success(
                       "Please check your email address for email verification"
                     );
+                    navigate(from, { replace: true });
                   })
-                  .catch((err) => console.log(err));
+                  .catch((err) => {
+                    console.log(err);
+                  });
               })
               .catch((err) => {
                 console.log(err);
               });
           })
-          .catch((err) => console.log(err));
+          .catch((err) => {
+            console.log(err);
+            setLoading(false);
+          });
       })
       .catch((err) => {
         console.log(err);
@@ -65,6 +76,7 @@ const Signup = () => {
     signInWithGoogle()
       .then(() => {
         toast.success("Google Sign in Successfully");
+        navigate(from, { replace: true });
       })
       .catch((err) => {
         console.log(err);
@@ -147,7 +159,7 @@ const Signup = () => {
                 type="submit"
                 classes="w-full px-8 py-3 font-semibold rounded-md bg-gray-900 hover:bg-gray-700 hover:text-white text-gray-100"
               >
-                Sign up
+                {loading ? <SmallSpinner /> : "Sign up"}
               </PrimaryButton>
             </div>
           </div>
