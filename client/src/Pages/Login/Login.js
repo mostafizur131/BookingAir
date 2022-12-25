@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import PrimaryButton from "../../Components/Button/PrimaryButton";
 import { AuthContext } from "../../contexts/AuthProvider";
 import SmallSpinner from "../../Components/Spinner/SmallSpinner";
+import { setAuthToken } from "../../api/auth";
 
 const Login = () => {
   const [resetEmail, setResetEmail] = useState("");
@@ -19,9 +20,10 @@ const Login = () => {
     const email = form.email.value;
     const password = form.password.value;
     signin(email, password)
-      .then(() => {
+      .then((result) => {
         toast.success("Log In Successful");
         form.reset();
+        setAuthToken(result.user);
         navigate(from, { replace: true });
       })
       .catch((err) => {
@@ -32,8 +34,9 @@ const Login = () => {
   //Google Log In
   const handleGoogleSignUp = () => {
     signInWithGoogle()
-      .then(() => {
+      .then((result) => {
         toast.success("Google Log in Successfully");
+        setAuthToken(result.user);
         navigate(from, { replace: true });
       })
       .catch((err) => {

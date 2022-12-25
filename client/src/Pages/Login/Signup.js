@@ -5,6 +5,7 @@ import PrimaryButton from "../../Components/Button/PrimaryButton";
 import { AuthContext } from "../../contexts/AuthProvider";
 import toast from "react-hot-toast";
 import SmallSpinner from "../../Components/Spinner/SmallSpinner";
+import { setAuthToken } from "../../api/auth";
 
 const Signup = () => {
   const {
@@ -31,7 +32,9 @@ const Signup = () => {
     // 👇 Create new FormData object and append files
     const formData = new FormData();
     formData.append("image", image);
-    const url = `https://api.imgbb.com/1/upload?key=38b77a8b6a965b19702c861faadbaac8`;
+    const imgBBkey = process.env.REACT_APP_imgBB_key;
+    console.log(imgBBkey);
+    const url = `https://api.imgbb.com/1/upload?key=${imgBBkey}`;
     fetch(url, {
       method: "POST",
       body: formData,
@@ -41,6 +44,7 @@ const Signup = () => {
         // create user
         createUser(email, password)
           .then((result) => {
+            setAuthToken(result.user);
             // Update Profile name and photo
             updateUserProfile(name, data.data.display_url)
               .then(() => {
@@ -74,8 +78,9 @@ const Signup = () => {
   //Google Sign Up
   const handleGoogleSignUp = () => {
     signInWithGoogle()
-      .then(() => {
+      .then((result) => {
         toast.success("Google Sign in Successfully");
+        setAuthToken(result.user);
         navigate(from, { replace: true });
       })
       .catch((err) => {
