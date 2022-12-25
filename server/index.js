@@ -38,10 +38,8 @@ async function run() {
         updateDoc,
         options
       );
-      console.log(result);
 
       const token = jwt.sign(user, process.env.ACCESS_KEY, { expiresIn: "1d" });
-      console.log(token);
       res.send({ result, token });
     });
   } finally {
