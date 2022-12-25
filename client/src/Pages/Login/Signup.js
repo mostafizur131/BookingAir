@@ -3,25 +3,72 @@ import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import PrimaryButton from "../../Components/Button/PrimaryButton";
 import { AuthContext } from "../../contexts/AuthProvider";
+import toast from "react-hot-toast";
 
 const Signup = () => {
-  const { createUser, updateUserProfile, verifyEmail, loading, setLoading } =
-    useContext(AuthContext);
+  const {
+    createUser,
+    updateUserProfile,
+    verifyEmail,
+    signInWithGoogle,
+    loading,
+    setLoading,
+  } = useContext(AuthContext);
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    const name = event.target.name.value;
-    const image = event.target.image.files[0];
-    const email = event.target.email.value;
-    const password = event.target.password.value;
+    const form = event.target;
+    const name = form.name.value;
+    const image = form.image.files[0];
+    const email = form.email.value;
+    const password = form.password.value;
 
-    const url = `https://api.imgbb.com/1/upload?key=38b77a8b6a965b19702c861faadbaac8`;
     // 👇 Create new FormData object and append files
     const formData = new FormData();
     formData.append("image", image);
+    const url = `https://api.imgbb.com/1/upload?key=38b77a8b6a965b19702c861faadbaac8`;
+    fetch(url, {
+      method: "POST",
+      body: formData,
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        // create user
+        createUser(email, password)
+          .then((result) => {
+            // Update Profile name and photo
+            updateUserProfile(name, data.data.display_url)
+              .then(() => {
+                //Send a user a verification email
+                verifyEmail()
+                  .then(() => {
+                    form.reset();
+                    toast.success(
+                      "Please check your email address for email verification"
+                    );
+                  })
+                  .catch((err) => console.log(err));
+              })
+              .catch((err) => {
+                console.log(err);
+              });
+          })
+          .catch((err) => console.log(err));
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
-    // create user
-    createUser(email, password).then((result) => console.log(result));
+  //Google Sign Up
+  const handleGoogleSignUp = () => {
+    signInWithGoogle()
+      .then(() => {
+        toast.success("Google Sign in Successfully");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   return (
@@ -113,7 +160,11 @@ const Signup = () => {
           <div className="flex-1 h-px sm:w-16 dark:bg-gray-700"></div>
         </div>
         <div className="flex justify-center space-x-4">
-          <button aria-label="Log in with Google" className="p-3 rounded-sm">
+          <button
+            onClick={handleGoogleSignUp}
+            aria-label="Log in with Google"
+            className="p-3 rounded-sm"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 32 32"
