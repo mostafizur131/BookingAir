@@ -41,7 +41,6 @@ const Checkout = () => {
   const handleBooking = () => {
     saveBooking(bookingData)
       .then((data) => {
-        console.log(data);
         toast.success("Booking Successful");
       })
       .catch((err) => {
