@@ -6,6 +6,7 @@ import WhosComing from "../Components/WhosComing";
 import Payment from "../Components/Payment";
 import { AuthContext } from "../contexts/AuthProvider";
 import toast from "react-hot-toast";
+import { saveBooking } from "../api/bookings";
 
 const Checkout = () => {
   const { user } = useContext(AuthContext);
@@ -38,7 +39,15 @@ const Checkout = () => {
   });
   const [selectedIndex, setSelectedIndex] = useState(0);
   const handleBooking = () => {
-    console.log(bookingData);
+    saveBooking(bookingData)
+      .then((data) => {
+        console.log(data);
+        toast.success("Booking Successful");
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error(err?.message);
+      });
   };
   return (
     <div className="md:flex gap-5 items-start justify-between sm:mx-10 md:mx-20 px-4 lg:mx-40 py-4">
