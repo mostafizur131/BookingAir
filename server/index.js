@@ -23,6 +23,7 @@ async function run() {
   try {
     const homesCollection = client.db("bookingAirDB").collection("homes");
     const usersCollection = client.db("bookingAirDB").collection("users");
+    const bookingsCollection = client.db("bookingAirDB").collection("bookings");
 
     //Save user and JWT authentication
     app.put("/user/:email", async (req, res) => {
@@ -41,6 +42,14 @@ async function run() {
 
       const token = jwt.sign(user, process.env.ACCESS_KEY, { expiresIn: "1d" });
       res.send({ result, token });
+    });
+
+    // Save Bookings
+    app.post("/bookings", async (req, res) => {
+      const bookingData = req.body;
+      const result = await bookingsCollection.insertOne(bookingData);
+      console.log(result);
+      res.send(result);
     });
   } finally {
   }
